@@ -75,8 +75,10 @@ actor class Tokenmania() = this {
     #Ok("Token deleted");
   };
 
-  // Zaktualizowana funkcja create_token
   public shared ({ caller }) func create_token({
+    token_name : Text;
+    token_symbol : Text;
+    initial_supply : Nat;
     token_logo : Text;
   }) : async Result<Text, Text> {
     if (created) {
@@ -87,27 +89,23 @@ actor class Tokenmania() = this {
       return #Err("Cannot create token with anonymous principal");
     };
 
-    // Ustawienie parametrów tokena zgodnie z wymaganiami:
-    // 1. Nazwa tokena INFOCOIN, symbol IFC.
-    // 2. Precyzja ustawiona na 2 miejsca po przecinku.
-    // 3. Brak kosztów transakcji (transfer_fee = 0).
-    // 4. Mintowanie na start: 10000 tokenów przypisane do konta wywołującego.
+    // Specify actual token details, set the caller to own some inital amount.
     init := {
       initial_mints = [{
         account = {
           owner = caller;
           subaccount = null;
         };
-        amount = 10000;
+        amount = initial_supply;
       }];
       minting_account = {
         owner = caller;
         subaccount = null;
       };
-      token_name = "INFOCOIN";
-      token_symbol = "IFC";
-      decimals = 2;
-      transfer_fee = 0;
+      token_name;
+      token_symbol;
+      decimals = 8; // Change this to the number of decimals you want to use.
+      transfer_fee = 10_000; // Change this to the fee you want to charge for transfers.
     };
 
     // Set the token logo.
